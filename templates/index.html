@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisionAI Pro | Image Intelligence</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+</head>
+<body>
+  <main class="page">
+    <header class="site-header">
+      <div class="brand-mark">V</div>
+      <div>
+        <p class="eyebrow">LOCAL COMPUTER VISION</p>
+        <h1>VisionAI <span>Pro</span></h1>
+      </div>
+    </header>
+
+    <section class="intro">
+      <p class="eyebrow">IMAGE INTELLIGENCE SYSTEM</p>
+      <h2>Understand what’s in your image.</h2>
+      <p class="intro-text">
+        Upload an image to see MobileNetV2 predictions and image details.
+        Your image is analyzed locally on this computer.
+      </p>
+    </section>
+
+    <section class="upload-card">
+      <h3>Analyze an image</h3>
+      <p class="muted">Choose a file or drop it in the box below.</p>
+
+      <form method="POST" enctype="multipart/form-data">
+        <label class="drop-zone" for="imageInput" id="dropZone">
+          <span class="upload-icon">↑</span>
+          <strong id="filePrompt">Choose or drop an image</strong>
+          <span class="muted" id="fileName">PNG, JPG, JPEG, or WebP · up to 15 MB</span>
+          <input
+            id="imageInput"
+            name="image"
+            type="file"
+            accept=".png,.jpg,.jpeg,.webp"
+            required
+          >
+        </label>
+
+        <img
+          id="previewImage"
+          class="preview-image"
+          alt="Preview of the selected image"
+          hidden
+        >
+
+        <button type="submit" class="analyze-button">Analyze image</button>
+      </form>
+
+      {% if error %}
+        <p class="error-message" role="alert">{{ error }}</p>
+      {% endif %}
+    </section>
+
+    {% if image_url %}
+      <section class="results">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">ANALYSIS COMPLETE</p>
+            <h2>Your results</h2>
+          </div>
+        </div>
+
+        <div class="results-grid">
+          <article class="result-card image-card">
+            <h3>Uploaded image</h3>
+            <img class="result-image" src="{{ image_url }}" alt="Image analyzed">
+          </article>
+
+          <article class="result-card">
+            <h3>Top predictions</h3>
+            <ol class="prediction-list">
+              {% for prediction in predictions %}
+                <li>
+                  <div class="prediction-heading">
+                    <span>{{ prediction.label }}</span>
+                    <strong>{{ prediction.confidence }}%</strong>
+                  </div>
+                  <div class="score-track">
+                    <span style="width: {{ prediction.confidence }}%"></span>
+                  </div>
+                </li>
+              {% endfor %}
+            </ol>
+            <p class="small-note">
+              Scores are model predictions, not guarantees.
+            </p>
+          </article>
+        </div>
+
+        <article class="result-card metadata-card">
+          <h3>Image details</h3>
+          <dl class="metadata-grid">
+            <div><dt>Dimensions</dt><dd>{{ image_info.width }} × {{ image_info.height }}</dd></div>
+            <div><dt>Total pixels</dt><dd>{{ "{:,}".format(image_info.total_pixels) }}</dd></div>
+            <div><dt>File size</dt><dd>{{ image_info.file_size_kb }} KB</dd></div>
+            <div><dt>Format</dt><dd>{{ image_info.format }}</dd></div>
+            <div><dt>Color mode</dt><dd>{{ image_info.color_mode }}</dd></div>
+            <div>
+              <dt>Average RGB</dt>
+              <dd>
+                {{ image_info.average_rgb.red }},
+                {{ image_info.average_rgb.green }},
+                {{ image_info.average_rgb.blue }}
+              </dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+    {% endif %}
+
+    <footer>
+      <p>VisionAI Pro · Local image analysis</p>
+    </footer>
+  </main>
+</body>
+</html>
